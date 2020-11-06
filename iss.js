@@ -20,7 +20,6 @@ const fetchMyIP = function(callback) {
       return;
     }
     const ip = JSON.parse(body);
-    console.log(ip);
     callback(null, ip);
   });
 };
@@ -59,9 +58,31 @@ const fetchISSFlyOverTimes = function(coords, callback) {
       return;
     }
     const data = JSON.parse(body);
-    console.log(data)
-  })
-}
+    const flyover = data.response
+    callback(null, flyover)
+  });
+};
 
+const nextISSTimesForMyLocation = function(callback) {
+  
+fetchMyIP((error, ipAddress) => {
+  if (error) {
+    return callback(error, null);
+  }
+  const numbers = ipAddress.ip
+  fetchCoordsByIP(numbers, (error, location) => {
+    if (error) {
+      return callback(error, null);
+    }
+    const coords = location;
+    fetchISSFlyOverTimes(coords, (error, data) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, data);
+      });
+    });
+  });
+};
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes};
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocation }
