@@ -25,6 +25,43 @@ const fetchMyIP = function(callback) {
   });
 };
 
-// fetchMyIP()
+const fetchCoordsByIP = function(ip, callback) {
+  request(`http://ip-api.com/json/${ip}`, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+      return;
+    }
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+    const data = JSON.parse(body);
+    const {lat, lon} = data;
+    const coords = {};
+    coords.latitude = lat;
+    coords.longitude = lon;
+    callback(null, coords);
+  });
+};
 
-module.exports = { fetchMyIP };
+
+const fetchISSFlyOverTimes = function(coords, callback) {
+  request(`http://api.open-notify.org/iss-pass.json?lat=${coords.latitude}&lon=${coords.longitude}`, (error, response, body) => {
+
+    if (error) {
+      callback(error, null);
+      return;
+    }
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+    const data = JSON.parse(body);
+    console.log(data)
+  })
+}
+
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes};
